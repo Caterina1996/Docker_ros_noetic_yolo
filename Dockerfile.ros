@@ -1,0 +1,42 @@
+# Use the pre-built ROS base image from DockerHub
+FROM mikweeh/ros-baseimage-01:latest
+
+# Set build-time arguments for user and group IDs
+ARG UID=1000
+ARG GID=1000
+
+# Switch to root to adjust user if needed
+USER root
+
+# Ensure the rosuser has the correct UID/GID
+RUN if [ $(id -u rosuser) -ne $UID ] || [ $(id -g rosuser) -ne $GID ]; then \
+        # Save current user info
+        OLD_UID=$(id -u rosuser) && \
+        OLD_GID=$(id -g rosuser) && \
+        # Change UID/GID
+        groupmod -g $GID rosuser 2>/dev/null || true && \
+        usermod -u $UID -g $GID rosuser && \
+        # Fix ownership of home directory
+        find /home/rosuser -user $OLD_UID -exec chown -h $UID {} \; \
+             2>/dev/null || true && \
+        find /home/rosuser -group $OLD_GID -exec chgrp -h $GID {} \; \
+             2>/dev/null || true; \
+    fi
+
+# Ensure proper ownership of workspace
+RUN chown -R $UID:$GID /home/rosuser
+
+# Copy project-specific requirements if they exist
+COPY requirements_py38.txt /tmp/requirements_py38_project.txt
+
+# Switch back to non-root user
+USER rosuser
+
+# Install additional project-specific Python dependencies
+RUN if [ -f /tmp/requirements_py38_project.txt ]; then \
+        python3 -m pip install --user -r /tmp/requirements_py38_project.txt; \
+    fi
+
+# Default command with ROS environment
+CMD ["/bin/bash", "--init-file", "/opt/ros/noetic/setup.bash"]
+

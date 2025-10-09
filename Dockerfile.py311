@@ -1,49 +1,60 @@
-FROM python:3.11-slim
+# Use the pre-built GPU-enabled Python base image from DockerHub
+FROM mikweeh/cv-baseimage-01:latest
 
+# Set build-time arguments for user and group IDs
 ARG UID=1000
 ARG GID=1000
 
-# Install Docker CLI and graphics dependencies
+# Switch to root to make user adjustments
+USER root
+
+# Ensure the rosuser has the correct UID/GID (adapting from base image)
+RUN if [ $(id -u rosuser) -ne $UID ] || [ $(id -g rosuser) -ne $GID ]; then \
+        # Save current user info
+        OLD_UID=$(id -u rosuser) && \
+        OLD_GID=$(id -g rosuser) && \
+        # Change UID/GID
+        groupmod -g $GID rosuser 2>/dev/null || true && \
+        usermod -u $UID -g $GID rosuser && \
+        # Fix ownership of home directory
+        find /home/rosuser -user $OLD_UID -exec chown -h $UID {} \; \
+             2>/dev/null || true && \
+        find /home/rosuser -group $OLD_GID -exec chgrp -h $GID {} \; \
+             2>/dev/null || true; \
+    fi
+
+# Install Docker CLI for container access
 RUN apt-get update && apt-get install -y \
     apt-transport-https \
     ca-certificates \
     curl \
     gnupg \
     lsb-release \
-    # Added graphics and vision dependencies below
-    build-essential \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libx11-xcb1 \
-    libxcb-dri3-0 \
-    libxtst6 \
-    libxkbcommon-x11-0 \
-    x11-apps \
-    && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list && \
-    apt-get update && \
-    apt-get install -y docker-ce-cli && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+       gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create user with matching UID/GID
-RUN groupadd -g $GID rosuser && \
-    useradd -m -u $UID -g $GID -s /bin/bash rosuser && \
-    groupadd -g 998 docker && \
-    usermod -aG docker rosuser
+# Create docker group and add user to it
+RUN groupadd -g 998 docker || true && \
+    usermod -aG docker rosuser || true
 
-# Copy requirements file
-COPY requirements_py311.txt /tmp/requirements_py311.txt
+# Ensure proper ownership of workspace
+RUN chown -R $UID:$GID /home/rosuser
 
-# Switch to user
+# Copy project-specific requirements
+COPY requirements_py311.txt /tmp/requirements_py311_project.txt
+
+# Switch to non-root user
 USER rosuser
-WORKDIR /home/rosuser/project
 
-# Install Python 3.11 requirements
-RUN pip install --user -r /tmp/requirements_py311.txt
+# Install additional project-specific Python dependencies
+RUN if [ -f /tmp/requirements_py311_project.txt ]; then \
+        pip install --user -r /tmp/requirements_py311_project.txt; \
+    fi
 
+# Default command
 CMD ["/bin/bash"]
-
