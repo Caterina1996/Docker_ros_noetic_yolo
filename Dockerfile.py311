@@ -1,0 +1,49 @@
+FROM python:3.11-slim
+
+ARG UID=1000
+ARG GID=1000
+
+# Install Docker CLI and graphics dependencies
+RUN apt-get update && apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release \
+    # Added graphics and vision dependencies below
+    build-essential \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libx11-xcb1 \
+    libxcb-dri3-0 \
+    libxtst6 \
+    libxkbcommon-x11-0 \
+    x11-apps \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list && \
+    apt-get update && \
+    apt-get install -y docker-ce-cli && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create user with matching UID/GID
+RUN groupadd -g $GID rosuser && \
+    useradd -m -u $UID -g $GID -s /bin/bash rosuser && \
+    groupadd -g 998 docker && \
+    usermod -aG docker rosuser
+
+# Copy requirements file
+COPY requirements_py311.txt /tmp/requirements_py311.txt
+
+# Switch to user
+USER rosuser
+WORKDIR /home/rosuser/project
+
+# Install Python 3.11 requirements
+RUN pip install --user -r /tmp/requirements_py311.txt
+
+CMD ["/bin/bash"]
+

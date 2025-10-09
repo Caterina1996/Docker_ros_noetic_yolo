@@ -1,0 +1,57 @@
+services:
+  ros-dev:
+    container_name: ${PROJECT_NAME}-ros
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: ros-noetic-py38
+    runtime: nvidia
+    environment:
+      - DISPLAY=$CONTAINER_DISPLAY
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - ./:/home/rosuser/project
+      - ${DATASET_PATH}:/home/rosuser/project/dataset:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    networks:
+      app-network:
+        aliases:
+          - ros-container
+    tty: true
+    stdin_open: true
+    command: bash -c "source /opt/ros/noetic/setup.bash && exec bash"
+
+  py311-dev:
+    container_name: ${PROJECT_NAME}-py311
+    build:
+      context: .
+      dockerfile: Dockerfile.py311
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: py311-dev
+    depends_on:
+      - ros-dev
+    environment:
+      - DISPLAY=$CONTAINER_DISPLAY
+    volumes:
+      - ./:/home/rosuser/project
+      - ${DATASET_PATH}:/home/rosuser/project/dataset:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    networks:
+      app-network:
+        aliases:
+          - py311-container
+    tty: true
+    stdin_open: true
+    command: bash -c "tail -f /dev/null"
+
+networks:
+  app-network:
+    name: ${PROJECT_NAME}-app-network
+    driver: bridge
+    attachable: true
