@@ -1,0 +1,76 @@
+services:
+  ros-dev:
+    container_name: ${PROJECT_NAME}-ros
+    build:
+      context: .
+      dockerfile: Dockerfile.ros
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: ${PROJECT_NAME}-ros:latest
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - DISPLAY=$CONTAINER_DISPLAY
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/home/rosuser/.Xauthority
+    volumes:
+      - ./:/home/rosuser/repo:rw
+      - ${DATASET}:/home/rosuser/repo/dataset:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-/run/user/1000/gdm/Xauthority}:/home/rosuser/.Xauthority:rw
+    networks:
+      app-network:
+        aliases:
+          - ros-container
+    tty: true
+    stdin_open: true
+    command: bash -c "source /opt/ros/noetic/setup.bash && exec bash"
+
+  py311-dev:
+    container_name: ${PROJECT_NAME}-py311
+    runtime: nvidia
+    build:
+      context: .
+      dockerfile: Dockerfile.py311
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: ${PROJECT_NAME}-py311:latest
+    depends_on:
+      - ros-dev
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - DISPLAY=$CONTAINER_DISPLAY
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/home/rosuser/.Xauthority
+    volumes:
+      - ./:/home/rosuser/repo:rw
+      - ${DATASET}:/home/rosuser/repo/dataset:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-/run/user/1000/gdm/Xauthority}:/home/rosuser/.Xauthority:rw
+    networks:
+      app-network:
+        aliases:
+          - py311-container
+    tty: true
+    stdin_open: true
+    command: bash -c "tail -f /dev/null"
+
+networks:
+  app-network:
+    name: ${PROJECT_NAME}-app-network
+    driver: bridge
+    attachable: true
