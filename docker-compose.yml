@@ -25,6 +25,9 @@ services:
       - ${DATASET}:/home/rosuser/repo/dataset:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-/run/user/1000/gdm/Xauthority}:/home/rosuser/.Xauthority:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /opt/spinnaker:/opt/spinnaker
+      - /home/slimbook:/home/rosuser/repo
     networks:
       app-network:
         aliases:

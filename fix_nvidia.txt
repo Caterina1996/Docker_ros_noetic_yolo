@@ -1,0 +1,22 @@
+ 1069  sudo apt-get update
+ 1070  sudo apt-get install -y nvidia-container-toolkit
+ 1071  distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+ 1072  curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey |   sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+ 1073  curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list |   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |   sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+ 1074  sudo apt-get update
+ 1075  distribution=ubuntu20.04
+ 1076  curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey |   sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+ 1077  curl -s -L https://nvidia.github.io/libnvidia-container/${distribution}/libnvidia-container.list |   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |   sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+ 1078  sudo apt-get update
+ 1079  git branch -a
+ 1080  git checkout development
+ 1081  gits
+ 1082  ls
+ 1083  la
+ 1084  gedit .env 
+ 1085  docker compose up -d
+ 1086  sudo apt-get install -y nvidia-container-toolkit
+ 1087  sudo nvidia-ctk runtime configure --runtime=docker
+ 1088  sudo systemctl restart docker
+ 1089  docker run --rm --gpus all nvidia/cuda:12.2.0-base nvidia-smi
+

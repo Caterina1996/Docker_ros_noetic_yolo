@@ -1,0 +1,55 @@
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome extract_imgs_disp_cinfo.launch bagfile:=\"//home/slimbook/bagfiles/SARMIENTO/2025_07_22/13_16_06/stereo_camera_images_2025-07-22-13-16-06_0.bag\" out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/13_16_06 scaled:=scaled_x2'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/rename_frames.py --in_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/13_16_06'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/inference_fish_for_measurement.py --data_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/13_16_06 --model_path //home/rosuser/repo/dataset/models/yv11m/ym_d18_poolv2r_lantytr_nocturnes/weights/last.pt'
+
+mv /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/13_16_06/inferred/* /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/13_16_06
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome segment_pointcloud.launch folder:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/13_16_06 pointcloud_size:=[1024,768] segmentation_out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/13_16_06/pointclouds/'
+docker exec  fish_3d-ros bash -c 'python             //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/measure_fish_new.py             --base_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/13_16_06/pointclouds/'
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome extract_imgs_disp_cinfo.launch bagfile:=\"//home/slimbook/bagfiles/SARMIENTO/2025_07_22/21_17_04/stereo_camera_images_2025-07-22-21-17-05_0.bag\" out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/21_17_04 scaled:=scaled_x2'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/rename_frames.py --in_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/21_17_04'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/inference_fish_for_measurement.py --data_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/21_17_04 --model_path //home/rosuser/repo/dataset/models/yv11m/ym_d18_poolv2r_lantytr_nocturnes/weights/last.pt'
+
+mv /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/21_17_04/inferred/* /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/21_17_04
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome segment_pointcloud.launch folder:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/21_17_04 pointcloud_size:=[1024,768] segmentation_out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/21_17_04/pointclouds/'
+docker exec  fish_3d-ros bash -c 'python             //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/measure_fish_new.py             --base_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/21_17_04/pointclouds/'
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome extract_imgs_disp_cinfo.launch bagfile:=\"//home/slimbook/bagfiles/SARMIENTO/2025_07_22/22_17_11/stereo_camera_images_2025-07-22-22-17-12_0.bag\" out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/22_17_11 scaled:=scaled_x2'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/rename_frames.py --in_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/22_17_11'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/inference_fish_for_measurement.py --data_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/22_17_11 --model_path //home/rosuser/repo/dataset/models/yv11m/ym_d18_poolv2r_lantytr_nocturnes/weights/last.pt'
+
+mv /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/22_17_11/inferred/* /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/22_17_11
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome segment_pointcloud.launch folder:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/22_17_11 pointcloud_size:=[1024,768] segmentation_out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/22_17_11/pointclouds/'
+docker exec  fish_3d-ros bash -c 'python             //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/measure_fish_new.py             --base_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/22_17_11/pointclouds/'
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome extract_imgs_disp_cinfo.launch bagfile:=\"//home/slimbook/bagfiles/SARMIENTO/2025_07_22/23_47_26/stereo_camera_images_2025-07-22-23-47-26_0.bag\" out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/23_47_26 scaled:=scaled_x2'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/rename_frames.py --in_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/23_47_26'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/inference_fish_for_measurement.py --data_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/23_47_26 --model_path //home/rosuser/repo/dataset/models/yv11m/ym_d18_poolv2r_lantytr_nocturnes/weights/last.pt'
+
+mv /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/23_47_26/inferred/* /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/23_47_26
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome segment_pointcloud.launch folder:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/23_47_26 pointcloud_size:=[1024,768] segmentation_out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/23_47_26/pointclouds/'
+docker exec  fish_3d-ros bash -c 'python             //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/measure_fish_new.py             --base_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/23_47_26/pointclouds/'
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome extract_imgs_disp_cinfo.launch bagfile:=\"//home/slimbook/bagfiles/SARMIENTO/2025_07_22/18_16_41/stereo_camera_images_2025-07-22-18-16-41_0.bag\" out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/18_16_41 scaled:=scaled_x2'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/rename_frames.py --in_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/18_16_41'
+
+docker exec  fish_3d-py311 bash -c 'python //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/inference_fish_for_measurement.py --data_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/18_16_41 --model_path //home/rosuser/repo/dataset/models/yv11m/ym_d18_poolv2r_lantytr_nocturnes/weights/last.pt'
+
+mv /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/18_16_41/inferred/* /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/18_16_41
+
+docker exec -it fish_3d-ros bash -c 'roslaunch stereo_plome segment_pointcloud.launch folder:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/18_16_41 pointcloud_size:=[1024,768] segmentation_out_dir:=/home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/18_16_41/pointclouds/'
+docker exec  fish_3d-ros bash -c 'python             //home/rosuser/repo/src/DL_utils/ros_dl_ws/src/stereo_plome/scripts/3D_utils/measure_fish_new.py             --base_path /home/slimbook/Docker_ros_noetic_yolo/src/out/SARMIENTO/2025_07_22/18_16_41/pointclouds/'
+
