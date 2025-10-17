@@ -178,6 +178,7 @@ dataset
 docs
 img
 imgs
+out/
 Checkpoint*/
 results
 output

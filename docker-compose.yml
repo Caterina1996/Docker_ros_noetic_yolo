@@ -1,33 +1,37 @@
 services:
   ros-dev:
     container_name: ${PROJECT_NAME}-ros
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    privileged: true
     build:
       context: .
       dockerfile: Dockerfile.ros
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-    image: ${PROJECT_NAME}-ros:latest
+    image: ros-baseimage-01b
     runtime: nvidia
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
     environment:
       - DISPLAY=$CONTAINER_DISPLAY
       - QT_X11_NO_MITSHM=1
       - XAUTHORITY=/home/rosuser/.Xauthority
     volumes:
-      - ./:/home/rosuser/repo:rw
-      - ${DATASET}:/home/rosuser/repo/dataset:ro
+      - ./:/home/rosuser/repo
+      - ${DATASET}:/home/rosuser/repo/dataset:rw
+      # Mount the cloned repositories
+      - ${DL_UTILS_PATH:-./external_repos/DL_utils}:/home/rosuser/repo/src/DL_utils/:rw
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XAUTHORITY:-/run/user/1000/gdm/Xauthority}:/home/rosuser/.Xauthority:rw
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - /opt/spinnaker:/opt/spinnaker
-      - /home/slimbook:/home/rosuser/repo
+      - /dev:/dev
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+    ports:
+      - "${DEBUG_PORT:-5678}:5678"
     networks:
       app-network:
         aliases:
@@ -35,43 +39,7 @@ services:
     tty: true
     stdin_open: true
     command: bash -c "source /opt/ros/noetic/setup.bash && exec bash"
-
-  py311-dev:
-    container_name: ${PROJECT_NAME}-py311
-    runtime: nvidia
-    build:
-      context: .
-      dockerfile: Dockerfile.py311
-      args:
-        UID: ${UID:-1000}
-        GID: ${GID:-1000}
-    image: ${PROJECT_NAME}-py311:latest
-    depends_on:
-      - ros-dev
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    environment:
-      - DISPLAY=$CONTAINER_DISPLAY
-      - QT_X11_NO_MITSHM=1
-      - XAUTHORITY=/home/rosuser/.Xauthority
-    volumes:
-      - ./:/home/rosuser/repo:rw
-      - ${DATASET}:/home/rosuser/repo/dataset:rw
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ${XAUTHORITY:-/run/user/1000/gdm/Xauthority}:/home/rosuser/.Xauthority:rw
-    networks:
-      app-network:
-        aliases:
-          - py311-container
-    tty: true
-    stdin_open: true
-    command: bash -c "tail -f /dev/null"
-
+ 
 networks:
   app-network:
     name: ${PROJECT_NAME}-app-network
