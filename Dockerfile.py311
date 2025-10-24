@@ -38,6 +38,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Nou per poder usar el pythorch amb gpu
+RUN pip install --upgrade pip \
+    && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
 # Create docker group and add user to it
 RUN groupadd -g 998 docker || true && \
     usermod -aG docker rosuser || true

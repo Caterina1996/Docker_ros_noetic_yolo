@@ -2,3 +2,5 @@
 python-dotenv
 natsort
 requests
+termcolor
+

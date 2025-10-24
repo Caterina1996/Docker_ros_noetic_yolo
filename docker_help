@@ -7,3 +7,13 @@ docker compose build *imatge*
 docker compose build --no-cache
 
 docker compose up -d
+
+
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+
+# Configure Docker to use the NVIDIA runtime
+sudo nvidia-ctk runtime configure --runtime=docker
+
+# Restart Docker
+sudo systemctl restart docker
