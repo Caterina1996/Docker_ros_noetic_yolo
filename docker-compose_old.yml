@@ -40,15 +40,15 @@ services:
     stdin_open: true
     command: bash -c "source /opt/ros/noetic/setup.bash && exec bash"
 
-  ultralytics_gpu-dev:
-    container_name: ${PROJECT_NAME}-ultralytics_gpu
+  py311-dev:
+    container_name: ${PROJECT_NAME}-py311
     build:
       context: .
-      dockerfile: Dockerfile.ultralytics_gpu
+      dockerfile: Dockerfile.py311
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-    image: ultralytics_gpu-dev
+    image: py311-dev
     depends_on:
       - ros-dev
     runtime: nvidia            # <-- Add this line
@@ -71,7 +71,7 @@ services:
     networks:
       app-network:
         aliases:
-          - ultralytics_gpu-container
+          - py311-container
     tty: true
     stdin_open: true
     command: bash -c "tail -f /dev/null"

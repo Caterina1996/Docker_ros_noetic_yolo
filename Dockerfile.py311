@@ -39,8 +39,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Nou per poder usar el pythorch amb gpu
-RUN pip install --upgrade pip \
-    && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# RUN pip install --upgrade pip \
+#  && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
 # Create docker group and add user to it
 RUN groupadd -g 998 docker || true && \
@@ -51,6 +51,12 @@ RUN chown -R $UID:$GID /home/rosuser
 
 # Copy project-specific requirements
 COPY requirements_py311.txt /tmp/requirements_py311_project.txt
+
+
+# RUN ln -sf /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so.12.1.105 \
+#           /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so.12
+# RUN ln -sf /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so.12.1.105 \
+#           /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so
 
 # Switch to non-root user
 USER rosuser

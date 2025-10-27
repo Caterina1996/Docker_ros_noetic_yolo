@@ -17,3 +17,11 @@ sudo nvidia-ctk runtime configure --runtime=docker
 
 # Restart Docker
 sudo systemctl restart docker
+
+
+check cuda:
+
+python3 -c "import torch; print(torch.version.cuda)"
+python3 -c "import torch; print(torch.cuda.get_device_name(0))"
+
+python3 -c "import ultralytics"
