@@ -1,1 +1,10 @@
 # Check the current installed libraries before adding them here
+numpy==1.24.4
+natsort
+cloudpickle
+requests
+termcolor
+open3d
+pyntcloud
+plotly
+hdbscan

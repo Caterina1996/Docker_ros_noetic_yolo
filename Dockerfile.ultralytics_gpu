@@ -1,49 +1,63 @@
-FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.1.0-devel-ubuntu20.04
 
 ARG UID=1000
 ARG GID=1000
+ENV DEBIAN_FRONTEND=noninteractive
 
 USER root
 
-# Instala Python 3.11 y utilidades base
-RUN apt-get update && apt-get install -y \
-    python3.11 python3.11-venv python3.11-distutils \
-    python3-pip curl apt-transport-https ca-certificates gnupg lsb-release \
-    && rm -rf /var/lib/apt/lists/*
+# -------------------------------------------------------------------
+# 🐍 Install Python 3.9 + basic utilities
+# -------------------------------------------------------------------
+RUN apt-get update && apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && apt-get install -y \
+        python3.9 python3.9-venv python3.9-distutils python3.9-dev python3.9-lib2to3 \
+        curl apt-transport-https ca-certificates gnupg lsb-release \
+        libgl1-mesa-glx libglib2.0-0 && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y python3.11 python3.11-venv python3.11-distutils python3-pip curl apt-transport-https ca-certificates gnupg lsb-release libgl1-mesa-glx libglib2.0-0 && rm -rf /var/lib/apt/lists/*
+# Set Python 3.9 as default system python
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2 && \
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.9
 
-# Alias python y pip a python3.11 y pip3 respectivamente
-RUN ln -sf /usr/bin/python3.11 /usr/bin/python && \
-    ln -sf /usr/bin/pip3 /usr/bin/pip
+# -------------------------------------------------------------------
+# 👤 Create rosuser
+# -------------------------------------------------------------------
+RUN groupadd -g ${GID} rosuser && \
+    useradd -m -u ${UID} -g ${GID} -s /bin/bash rosuser && \
+    chown -R ${UID}:${GID} /home/rosuser
 
-# Crear grupo y usuario rosuser con UID/GID pasados como argumento
-RUN groupadd -g $GID rosuser && \
-    useradd -m -u $UID -g $GID -s /bin/bash rosuser
-
-# Ahora cabia propiedad en el home del usuario, que ya debe existir
-RUN chown -R $UID:$GID /home/rosuser
-
-# Instala Docker CLI (opcional, para uso dentro del contenedor)
+# -------------------------------------------------------------------
+# 🐳 (Optional) Install Docker CLI inside container
+# -------------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     apt-transport-https ca-certificates curl gnupg lsb-release && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list && \
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu focal stable" > /etc/apt/sources.list.d/docker.list && \
     apt-get update && apt-get install -y docker-ce-cli && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Añadir usuario rosuser al grupo docker
-RUN groupadd -g 998 docker || true && \
-    usermod -aG docker rosuser || true
+RUN groupadd -g 998 docker || true && usermod -aG docker rosuser || true
 
-# Copiar archivo de requerimientos y luego instalarlos como rosuser
-COPY requirements_py311.txt /tmp/requirements_py311_project.txt
 
+# Install python and all the dependencies I need?
+RUN mkdir -p /var/lib/apt/lists/partial && chmod 755 /var/lib/apt/lists/partial && \
+    apt-get update && apt-get install -y python3-pip && \
+    python3.9 -m pip install numpy==1.24.4 opencv-python==4.7.0.72 && \
+    python3.9 -m pip install torch==2.1.0+cu121 torchvision==0.16.0+cu121 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121 && \
+    python3.9 -m pip install ultralytics==8.0.20 natsort cloudpickle requests termcolor && \
+    python3.9 -m pip cache purge
+
+
+# -------------------------------------------------------------------
+# 📦 Install Python dependencies under user
+# -------------------------------------------------------------------
 USER rosuser
 ENV PATH=/home/rosuser/.local/bin:$PATH
 
-RUN pip install --upgrade pip && \
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 && \
-    pip install ultralytics natsort requests termcolor
+COPY requirements_py311.txt /tmp/requirements_py311_project.txt
+RUN python3.9 -m pip install -r /tmp/requirements_py311_project.txt --no-cache-dir
+
 
 CMD ["/bin/bash"]
