@@ -46,7 +46,7 @@ RUN mkdir -p /var/lib/apt/lists/partial && chmod 755 /var/lib/apt/lists/partial 
     apt-get update && apt-get install -y python3-pip && \
     python3.9 -m pip install numpy==1.24.4 opencv-python==4.7.0.72 && \
     python3.9 -m pip install torch==2.1.0+cu121 torchvision==0.16.0+cu121 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121 && \
-    python3.9 -m pip install ultralytics==8.0.20 natsort cloudpickle requests termcolor && \
+    python3.9 -m pip install ultralytics==8.3.0 natsort cloudpickle requests termcolor && \
     python3.9 -m pip cache purge
 
 
