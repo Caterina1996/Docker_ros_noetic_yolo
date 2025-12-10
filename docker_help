@@ -1,5 +1,8 @@
 docker exec -it fish_3d-ros bash
 
+"source /opt/ros/noetic/setup.bash && "
+            "source /home/rosuser/repo/src/DL_utils/ros_dl_ws/devel/setup.bash && "
+
 
 # Per tornar a montar un contenidor
 docker compose build *imatge*
